@@ -17,12 +17,10 @@ it also condenses everything into a class so it can be ran with a few lines.
 Right now, the library is not hosted on **PyPi** so you will need to do a local
 install on your system if you plan to use it in other scrips you use.
 
-First, clone this repo to your local system. After you clone the repo, make sure
-to run the `setup.py` file, so you can install any dependencies you may need. To
-run the `setup.py` file, run the following command in your terminal.
+From the terminal, run this command 
 
 ```console
-pip install -e .
+pip install git+https://github.com/wheynelau/portfolio-optimization
 ```
 
 This will install all the dependencies listed in the `setup.py` file. Once done
@@ -51,7 +49,10 @@ pyopt.add_crypto(crypto)
 
 pyopt.run()
 ```
-
 ## Support me
 Still a student so creating this was just a hobby. Providing feedback or criticisms will greatly help me.
 Giving me a star helps too. 
+
+## Contribute to this project
+I added some TODO or ideas for improvements but due to exams I did not manage fix many of them.
+If there are issues please post them so I can try to fix them.
