@@ -21,7 +21,8 @@ Eg: Stock A costs 50 and with capital of 200, Stock A weightage can only be 0,0.
 
 5. Use a provided CSV file, useful if the stock/crypto can't be found on yfinance. May be useful for funds
 
-6. Max weightage for specific asset. Example runfile gives 100% BNB weights for scipy  Example max 10% in BTC. 
+6. Max weightage for specific asset, for this case the runfile gives 100% BNB weights for scipy.
+Another situation would be set crypto portfolio to be max 25% of total portfolio
 """
 
 
