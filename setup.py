@@ -24,8 +24,6 @@ REQUIRED = [
     'yfinance','numpy','pandas','matplotlib','scipy'
 ]
 
-}
-
 
 here = os.path.abspath(os.path.dirname(__file__))
 
