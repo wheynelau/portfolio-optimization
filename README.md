@@ -26,6 +26,9 @@ pip install git+https://github.com/wheynelau/portfolio-optimization
 This will install all the dependencies listed in the `setup.py` file. Once done
 you can use the library wherever you want.
 
+Potential issues: As this is my first repo if the setup does not work I may not know how to fix,
+please do just copy the code if it doesn't work.
+
 ## Usage
 
 Simple example to optimize a portfolio for crypto and stocks
