@@ -22,6 +22,7 @@ VERSION = '0.1.0'
 
 REQUIRED = [
     'yfinance','numpy','pandas','matplotlib','scipy'
+EXTRAS = []
 ]
 
 
