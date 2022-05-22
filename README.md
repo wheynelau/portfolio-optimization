@@ -1,16 +1,16 @@
-# Portfolio Optimization in Python
+# Portfolio Optimization in Python with cryptocurrencies
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Setup](#setup)
 - [Usage](#usage)
-- [Support These Projects](#support-these-projects)
+- [Support Me](#support-me)
 
 ## Overview
 
-A simple python project where we use price data from the NASDAQ website to help
-optimize our portfolio of stocks using modern portfolio theory.
+This fork is an improvement done on the original portfolio optimization, 
+it also condenses everything into a class so it can be ran with a few lines.
 
 ## Setup
 
@@ -30,32 +30,27 @@ you can use the library wherever you want.
 
 ## Usage
 
-Here is a simple example of using the `pyopt` library to grab the index
-files for specific quarter.
+Simple example to optimize a portfolio for crypto and stocks
 
 ```python
 import pandas as pd
-from pyopt.client import PriceHistory
+from pyopt.client import PyOpt
 
-# Define the symbols
-symbols = ['AAPL', 'MSFT', 'SQ']
-number_of_symbols = len(symbols)
+# Define the symbols: Stocks and/or crypto (Actual input is not case-sensitive)
+stocks = ['AAPL', 'MSFT', 'SQ']
+crypto = ['BNB','BTC']
 
 # Initialize the client.
-price_history_client = PriceHistory(symbols=['AAPL','MSFT','SQ'])
+pyopt = PyOpt() <--- This can be done before or after defining the symbols
 
-# Dump it to a CSV file.
-price_history_client.price_data_frame.to_csv(
-    'stock_data.csv',
-    index=False
-)
-pprint(price_history_client.price_data_frame)
-```
+# Add tickers to the optimizer
+pyopt.add_stocks(stocks)
+pyopt.add_crypto(crypto)
 
-## Support These Projects
+# Run optimizer
 
-**Patreon:**
-Help support this project and future projects by donating to my [Patreon Page](https://www.patreon.com/sigmacoding). I'm always looking to add more content for individuals like yourself, unfortuantely some of the APIs I would require me to pay monthly fees.
+pyopt.run()
 
-**YouTube:**
-If you'd like to watch more of my content, feel free to visit my YouTube channel [Sigma Coding](https://www.youtube.com/c/SigmaCoding).
+## Support me
+Still a student so creating this was just a hobby. Providing feedback or criticisms will greatly help me.
+Giving me a star helps too. 
