@@ -18,7 +18,7 @@ DESCRIPTION = 'Portfolio optimization with stocks and cryptocurrencies'
 URL = 'https://github.com/wheynelau/portfolio-optimization/'
 EMAIL = 'me@example.com'
 AUTHOR = 'Wayne'
-REQUIRES_PYTHON = '>=3.7.0'
+REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.1.0'
 
 REQUIRED = [
@@ -103,7 +103,9 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+    packages=find_packages(
+        include = ['pyopt']
+    ),
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
