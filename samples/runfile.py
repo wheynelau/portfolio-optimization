@@ -10,9 +10,18 @@ crypto = ['bnb','btc','xrp','eth']
 pyopt.add_stocks(['voo','vwra.l','qqq','gbug','spbo']) 
 
 pyopt.add_crypto(crypto)
+
+# Set period to test (default:'1y')
 # pyopt.period = '1y'
+
+# Number of simulations for Monte Carlo (default:5000)
 # pyopt.simulations = 10000
-# pyopt.minimize = 'sharpe' 
+
+# Target for scipy minimize (default: 'sharpe')
+# pyopt.minimize = 'sharpe'
+
+# Risk free rate (default: 2)
+# pyopt.RFR = 2
 
 # Run optimizer
 
