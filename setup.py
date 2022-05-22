@@ -18,7 +18,7 @@ DESCRIPTION = 'Portfolio optimization with stocks and cryptocurrencies'
 URL = 'https://github.com/wheynelau/portfolio-optimization/'
 EMAIL = 'me@example.com'
 AUTHOR = 'Wayne'
-REQUIRES_PYTHON = '>=3.6.0'
+REQUIRES_PYTHON = '>=3.7.0'
 VERSION = '0.1.0'
 
 REQUIRED = [
@@ -122,7 +122,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],
