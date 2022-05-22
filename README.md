@@ -50,6 +50,7 @@ pyopt.add_crypto(crypto)
 # Run optimizer
 
 pyopt.run()
+```
 
 ## Support me
 Still a student so creating this was just a hobby. Providing feedback or criticisms will greatly help me.
