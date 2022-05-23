@@ -81,7 +81,7 @@ pyopt.run()
 - [ ] Minumum weightage purchase. (Useful if low capital and no fractional shares)
 - [ ] Print results to html for readability and save it for future reference
 - [ ] Input using user provided .csv files
-- [ ] Max weightage option, to limit
+- [ ] Max weightage option, Ex to limit BTC to 5%
 - [ ] Experiment getting input using **kwargs 
 - [ ] Provide more settings
 
