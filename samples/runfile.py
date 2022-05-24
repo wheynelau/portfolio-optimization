@@ -18,7 +18,7 @@ pyopt.add_crypto(crypto)
 # pyopt.simulations = 10000
 
 # Target for scipy minimize (default: 'sharpe')
-# pyopt.minimize = 'sharpe'
+# pyopt.target = 'sharpe'
 
 # Risk free rate (default: 2)
 # pyopt.RFR = 2
