@@ -641,7 +641,7 @@ class PyOpt:
 
         # Print details for given result series
 
-        print(f"Returns:\t {resultSeries[0] * 100:.3f}%")
+        print(f"Returns:\t {resultSeries[0]:.3f}%")
         print(f"Volatility:\t {resultSeries[1]:.3f}")
         print(f"Sharpe Ratio:\t {resultSeries[2]:.3f}")
         print("Weights:")
