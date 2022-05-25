@@ -517,9 +517,15 @@ class PyOpt:
             weights = np.array(np.random.random(self._number_of_tickers))
             weights = weights / np.sum(weights)
 
-            check_max = weights > self._max_weights / 100
-
+            # If loop skips if the value is unchanged or set as the default
             if self._max_weights != 100:
+
+                # Boolean array to check if any value is bigger than the max weightage
+                check_max = weights > self._max_weights / 100
+
+                # While there is a value greater than the max weights, the loop continues running
+                # If there is a more pythonic way of doing this please do mention it
+
                 while np.any(check_max):
                     weights = np.array(np.random.random(self._number_of_tickers))
                     weights = weights / np.sum(weights)
