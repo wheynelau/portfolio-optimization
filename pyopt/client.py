@@ -72,6 +72,7 @@ class PyOpt:
         self._trading_days = 365
         self._period = '1y'
         self._RFR = 2
+        self._max_weights = 100
 
         # Initialize dataframes
         self._fullDf = pd.DataFrame()
@@ -248,6 +249,55 @@ class PyOpt:
         else:
             self._minimize = newTarget
 
+    @property
+    def maxweights(self):
+        """
+        | Get the max weights in percent
+        |
+        | Default is 100 (%)
+        |
+        | Example:
+        --------
+
+        >>> print(Foo.maxweights)
+        100
+
+        :return: Returns current max weights
+        """
+
+    @maxweights.setter
+    def maxweights(self, newWeights: float):
+        """
+        | Sets new weights value in percent
+        |
+        | Must only be run after adding stocks and crypto
+        |
+        | Example
+        --------
+
+        >>> Foo.maxweights = 20.5
+
+
+        :param newWeights: float between 0-100
+        """
+        self._tickers = self._symbols_for_yfinance.strip().split(" ")
+        self._number_of_tickers = len(self._tickers)
+        try:
+            float(newWeights)
+            if self._symbols_for_yfinance == "":
+                print("Please add assets first or run this after, setting default of 100%")
+            elif newWeights > 100 or newWeights <= 0:
+                print("Please set value between 0-100")
+            elif 100 / self._number_of_tickers > newWeights:
+                print(f"Please increase weights or reduce assets, "
+                      f"can't set max weights lower than {100 / self._number_of_tickers:.2f}%\n"
+                      f"Setting default of 100%.")
+
+            else:
+                self._max_weights = newWeights
+        except ValueError:
+            print("Invalid weights set, defaulting to 100%.")
+
     # For future use, create backtest function
     @property
     def optimize(self):
@@ -288,14 +338,26 @@ class PyOpt:
         """
         | Risk-Free rate. The default value is 2 percent.
         |
+        | Negative values are also accepted but the range is -100 to 100, although unrealistic
+        |
         | Example:
         --------
 
         >>>Foo.RFR = 1.5
 
         :param newRFR: Input number in percent
-        :return:
         """
+
+        try:
+            float(newRFR)
+        except ValueError:
+            raise ValueError("Please enter a valid Risk Free Rate between -100 and 100")
+
+        if -100 <= newRFR <= 100:
+            self._RFR = newRFR
+
+        else:
+            raise ValueError("Please enter a valid Risk Free Rate between -100 and 100")
 
     # Creates a string from given stocks/crypto
     # TODO: Error catching? Although yfinance will throw out an error if invalid input
@@ -415,7 +477,7 @@ class PyOpt:
         self._log_returns = self._fullDf.pct_change()
 
     def _get_params(self):
-        print(f"CURRENT PARAMS\n\n"
+        print(f"CURRENT PARAMS\n"
               f"{'=' * 60}\n"
               f"Number of tickers:\t {self._number_of_tickers}\n"
               f"Tickers: \t{str(self._tickers)}\n"
@@ -455,6 +517,14 @@ class PyOpt:
             weights = np.array(np.random.random(self._number_of_tickers))
             weights = weights / np.sum(weights)
 
+            check_max = weights > self._max_weights / 100
+
+            if self._max_weights != 100:
+                while np.any(check_max):
+                    weights = np.array(np.random.random(self._number_of_tickers))
+                    weights = weights / np.sum(weights)
+                    check_max = weights > self._max_weights / 100
+
             # Add the weights, to the `weights_arrays`.
             all_weights[ind, :] = weights
 
@@ -488,6 +558,10 @@ class PyOpt:
     # Gets max sharpe, min vol and plots graph
 
     def _summary(self):
+
+        # Convert returns to %
+
+        self._simulations_df['Returns'] = self._simulations_df['Returns'] * 100
 
         # Return the Max Sharpe Ratio from the run.
         self._max_sharpe_ratio = self._simulations_df.loc[self._simulations_df['Sharpe Ratio'].idxmax()]
@@ -583,7 +657,7 @@ class PyOpt:
 
     def _fit(self):
 
-        bounds = tuple((0, 1) for symbol in range(self._number_of_tickers))
+        bounds = tuple((0, self._max_weights / 100) for symbol in range(self._number_of_tickers))
 
         # Define the constraints, here I'm saying that the sum of each weight must not exceed 100%.
         constraints = ({'type': 'eq', 'fun': self._check_sum})
