@@ -161,7 +161,6 @@ class PyOpt:
             )
 
         else:
-            print("Period set as", newPeriod)
             self._period = newPeriod
 
     @property
@@ -439,7 +438,7 @@ class PyOpt:
 
     # Main run function
 
-    def run(self, method: Optional[str] = None):
+    def run(self, method: Optional[str] = None, minimize: Optional[str] = None):
         """
         | Main run function
         |
@@ -492,7 +491,7 @@ class PyOpt:
         """
         if self._optimize:
             if method == "fmin":
-                return self._fit()
+                return self._fit(minimize=minimize)
             else:
                 self._monte_carlo()
                 self._summary()
@@ -724,7 +723,7 @@ class PyOpt:
 
     # Runs scipy.optimize
 
-    def _fit(self):
+    def _fit(self, minimize: Optional[str] = None):
 
         bounds = tuple(
             (0, self._max_weights / 100) for _ in range(self._number_of_tickers)
@@ -738,6 +737,7 @@ class PyOpt:
         # Perform the operation to minimize the risk.
         optimized_sharpe = sci_opt.minimize(
             fun=self._optimizing_func,
+            args=(minimize,),
             x0=init_guess,  # minimize this. # Start with these values.
             method="SLSQP",
             bounds=bounds,  # don't exceed these bounds.
@@ -815,7 +815,7 @@ class PyOpt:
 
     # Returns based on the optimizing function
 
-    def _optimizing_func(self, weights: list) -> np.array:
+    def _optimizing_func(self, weights: list, minimize: str = None) -> np.array:
 
         """The function used to minimize the Sharpe Ratio.
 
@@ -830,12 +830,13 @@ class PyOpt:
         Returns, vol, sharpe (default)
         (np.array): An numpy array of the portfolio metrics.
         """
+        minimize = minimize or self._minimize.lower()
         # Return negative sharpe
-        if self._minimize.lower() == "sharpe":
+        if minimize == "sharpe":
             return -self._get_metrics(weights)[2]
 
         # Return vol
-        elif self._minimize.lower() == "vol":
+        elif minimize == "vol":
             return self._get_metrics(weights)[1]
 
         # Return negative returns

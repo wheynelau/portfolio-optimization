@@ -8,12 +8,20 @@ from src.pyopt import PyOpt
 
 os.environ["IS_STREAMLIT"] = "true"
 opt = PyOpt()
+
+st.set_page_config(
+    page_title="Portfolio Optimisation",
+    page_icon="📈",
+    layout="wide",
+)
+
 st.title("Portfolio Optimisation")
+
 
 st.write(
     """
 
-This app optimises a portfolio of stocks and crytos based on the Sharpe Ratio.
+This app optimises a portfolio of stocks and crytos based on the Sharpe Ratio and Volatility.
 
 Input your stocks and crypto names and the app will return the optimal portfolio weights.
 
@@ -29,7 +37,7 @@ opt.period = st.selectbox(
 )
 
 opt.RFR = st.number_input(
-    label="Risk Free Rate", value=2, help="Risk Free Rate in percent"
+    label="Risk Free Rate", value=2.0, help="Risk Free Rate in percent", format="%f"
 )
 
 crypto = st.text_input(
@@ -62,17 +70,35 @@ if stocks or crypto:
         label="Max weightage of each asset",
         min_value=100 / len(stocks_split + crypto_split),
         max_value=100.0,
+        value=100.0,
         step=1.0,
         help="Max allocation per asset in percent",
     )
-
-    outputs = opt.run(method="fmin")
-    st.write("## OPTIMIZED SHARPE RATIO USING SCIPY")
-    st.write(f"Returns:\t {outputs['metrics'][0] * 100:.3f}%")
-    st.write(f"Volatility:\t {outputs['metrics'][1]:.3f}")
-    st.write(f"Sharpe Ratio:\t {outputs['metrics'][2]:.3f}")
-    st.subheader("Weights:")
-    st.dataframe(outputs["result"])
+    if st.button("Optimise"):
+        col1, col2 = st.columns(2)
+        with col1:
+            outputs = opt.run(method="fmin", minimize="sharpe")
+            st.write("## OPTIMIZED SHARPE RATIO")
+            st.write(f"Returns:\t {outputs['metrics'][0] * 100:.3f}%")
+            st.write(f"Volatility:\t {outputs['metrics'][1]:.3f}")
+            st.write(f"Sharpe Ratio:\t {outputs['metrics'][2]:.3f}")
+            st.subheader("Weights:")
+            st.dataframe(outputs["result"])
+        with col2:
+            outputs = opt.run(method="fmin", minimize="vol")
+            st.write("## OPTIMIZED VOLATILITY")
+            st.write(f"Returns:\t {outputs['metrics'][0] * 100:.3f}%")
+            st.write(f"Volatility:\t {outputs['metrics'][1]:.3f}")
+            st.write(f"Sharpe Ratio:\t {outputs['metrics'][2]:.3f}")
+            st.subheader("Weights:")
+            st.dataframe(outputs["result"])
 
 else:
     st.write("Looks like your portfolio is still empty. Add some stocks or crypto!")
+
+with st.expander("Issues"):
+    st.write(
+        """
+    It doesn't seem to handle negative sharpe ratios well yet.
+    """
+    )
