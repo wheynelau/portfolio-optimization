@@ -2,29 +2,38 @@
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Known Issues](#known-issues)
-- [TODO](#todo)
-- [Support Me](#support-me)
-- [Contribute to this project](#contribute-to-this-project)
-- [Credits](#credits)
+- [Portfolio Optimization in Python with cryptocurrencies](#portfolio-optimization-in-python-with-cryptocurrencies)
+  - [Table of Contents](#table-of-contents)
+  - [Demo](#demo)
+  - [Overview](#overview)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Known issues](#known-issues)
+  - [TODO](#todo)
+    - [Personal](#personal)
+    - [Project](#project)
+  - [Support me](#support-me)
+  - [Contribute to this project](#contribute-to-this-project)
+  - [Credits](#credits)
+
+## Demo
+
+The online demo is available on streamlit [here](https://portfolio-optimisation.streamlit.app/)
 
 ## Overview
 
-This fork is an improvement done on the original portfolio optimization, 
-it also condenses everything into a class so it can be ran with a few lines. 
+This fork is an improvement done on the original portfolio optimization,
+it also condenses everything into a class so it can be ran with a few lines.
 The main algorithms have not been modified much.
 It uses yfinance as the provider for historical data and is optimized using
-scipy.minimize function and Monte Carlo method. 
+scipy.minimize function and Monte Carlo method.
 
 ## Installation
 
 Right now, the library is not hosted on **PyPi** so you will need to do a local
 install on your system if you plan to use it in other scrips you use.
 
-From the terminal, run this command 
+From the terminal, run this command
 
 ```console
 pip install git+https://github.com/wheynelau/portfolio-optimization
@@ -69,7 +78,7 @@ pyopt.run()
 - [ ] Missing error handling on some inputs
 
 ## TODO
- 
+
 ### Personal
 
 - [ ] Clean up code and make it more readable
@@ -83,13 +92,13 @@ pyopt.run()
 - [ ] Input using user provided .csv files
 - [x] Max weightage option Update: Not specified securities, but for all
 - [ ] Weightage for individual securities . Would be better with gui or menu based
-- [ ] Experiment getting input using **kwargs 
+- [ ] Experiment getting input using **kwargs
 - [ ] Provide more settings
 
 ## Support me
 
 Still a student so creating this was just a hobby. Providing feedback or criticisms will greatly help me.
-Giving me a star helps too. 
+Giving me a star helps too.
 
 ## Contribute to this project
 
@@ -98,5 +107,5 @@ If there are issues please post them so I can try to fix them.
 
 ## Credits
 
-Credits to areed1192's github and his youtube for motivating and teaching me the algorithm's for 
+Credits to areed1192's github and his youtube for motivating and teaching me the algorithm's for
 Monte Carlo and scipy.minimize. You can check out his infomative youtube channel [here!](https://www.youtube.com/c/SigmaCoding)
