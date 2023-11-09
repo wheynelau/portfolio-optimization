@@ -49,23 +49,17 @@ crypto = st.text_input(
                        """,
 )
 
-crypto_split = [c.strip() for c in crypto.split(",")]
-opt.add_crypto(crypto_split)
-
 stocks = st.text_input(
     label="Enter your stock tickers separated by a comma (,)" " Non case sensitive.",
     placeholder="voo, vwra.l, qqq, gbug, spbo",
     help="You might need to google for the ticker name.",
 )
-stocks_split = [s.strip() for s in stocks.split(",")]
+stocks_split = [s.strip() for s in stocks.split(",") if s.strip()]
+crypto_split = [c.strip() for c in crypto.split(",") if c.strip()]
+
+opt.add_crypto(crypto_split)
 opt.add_stocks(stocks_split)
-
-if stocks or crypto:
-    crypto_split = [c.strip() for c in crypto.split(",")]
-    opt.add_crypto(crypto_split)
-    stocks_split = [s.strip() for s in stocks.split(",")]
-    opt.add_stocks(stocks_split)
-
+if (len(stocks_split) + len(crypto_split)) > 1:
     opt.maxweights = st.slider(
         label="Max weightage of each asset",
         min_value=100 / len(stocks_split + crypto_split),
@@ -94,7 +88,7 @@ if stocks or crypto:
             st.dataframe(outputs["result"])
 
 else:
-    st.write("Looks like your portfolio is still empty. Add some stocks or crypto!")
+    st.write("Add some stocks or crypto! 👆 You need more than one to optimise!")
 
 with st.expander("Issues"):
     st.write(
