@@ -1,3 +1,5 @@
+from typing import Optional
+import os
 import numpy as np
 import pandas as pd
 import yfinance as yf
@@ -5,8 +7,8 @@ import matplotlib.pyplot as plt
 import scipy.optimize as sci_opt
 from datetime import date
 
-""" 
-Improvements to be made: 
+"""
+Improvements to be made:
 1. Clean up if possible and write more pythonic codes ,open to feedback and criticism
 
 TODO List:
@@ -14,10 +16,10 @@ TODO List:
 
 2. Menu based program with error handling
 
-3. Add fractional constraints 
+3. Add fractional constraints
 Eg: Stock A costs 50 and with capital of 200, Stock A weightage can only be 0,0.25,0.5,0.75 or 1
 
-4. Print results to a webpage with visualization of capital growth 
+4. Print results to a webpage with visualization of capital growth
 
 5. Use a provided CSV file, useful if the stock/crypto can't be found on yfinance. May be useful for funds
 
@@ -57,9 +59,11 @@ class PyOpt:
 
     """
 
-    def __init__(self):
+    def __init__(self, method: str = "fmin"):
         """
         Constructs the PyOpt object with the default values
+
+        :param method: Default is 'fmin' for scipy.optimize.minimize
         """
 
         # Initializes appropriate type
@@ -70,7 +74,7 @@ class PyOpt:
         # Default values
         self._simulations = 5000
         self._trading_days = 365
-        self._period = '1y'
+        self._period = "1y"
         self._RFR = 2
         self._max_weights = 100
 
@@ -81,9 +85,10 @@ class PyOpt:
 
         # For future use
         self._optimize = True
+        self._method = method
 
         # Scipy function
-        self._minimize = 'sharpe'
+        self._minimize = "sharpe"
 
     # Returns list of tickers
 
@@ -134,15 +139,29 @@ class PyOpt:
 
         :param newPeriod: Valid periods are: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
         """
-        valid_periods = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max']
+        valid_periods = [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "5y",
+            "10y",
+            "ytd",
+            "max",
+        ]
 
         if newPeriod.lower() not in valid_periods:
 
-            raise TypeError(f"Invalid period: Please choose from one of the following"
-                            f"{str(valid_periods)}")
+            raise TypeError(
+                f"Invalid period: Please choose from one of the following"
+                f"{str(valid_periods)}"
+            )
 
         else:
-
+            print("Period set as", newPeriod)
             self._period = newPeriod
 
     @property
@@ -184,7 +203,10 @@ class PyOpt:
         """
 
         if newSimulations <= 1000:
-            print(newSimulations, "simulations might be too low. Results may not be accurate.")
+            print(
+                newSimulations,
+                "simulations might be too low. Results may not be accurate.",
+            )
             self._simulations = newSimulations
 
         elif newSimulations > 1000:
@@ -242,7 +264,7 @@ class PyOpt:
             raise AttributeError("Please input 'sharpe', 'vol' or 'returns' only.")
         newTarget = newTarget.lower()
         # Input validation
-        if newTarget not in ['sharpe', 'vol', 'returns']:
+        if newTarget not in ["sharpe", "vol", "returns"]:
 
             raise ValueError("Please input 'sharpe', 'vol' or 'returns' only.")
 
@@ -264,6 +286,7 @@ class PyOpt:
 
         :return: Returns current max weights
         """
+        return self._max_weights
 
     @maxweights.setter
     def maxweights(self, newWeights: float):
@@ -285,13 +308,17 @@ class PyOpt:
         try:
             float(newWeights)
             if self._symbols_for_yfinance == "":
-                print("Please add assets first or run this after, setting default of 100%")
+                print(
+                    "Please add assets first or run this after, setting default of 100%"
+                )
             elif newWeights > 100 or newWeights <= 0:
                 print("Please set value between 0-100")
             elif 100 / self._number_of_tickers > newWeights:
-                print(f"Please increase weights or reduce assets, "
-                      f"can't set max weights lower than {100 / self._number_of_tickers:.2f}%\n"
-                      f"Setting default of 100%.")
+                print(
+                    f"Please increase weights or reduce assets, "
+                    f"can't set max weights lower than {100 / self._number_of_tickers:.2f}%\n"
+                    f"Setting default of 100%."
+                )
 
             else:
                 self._max_weights = newWeights
@@ -309,26 +336,26 @@ class PyOpt:
 
         newOptimize = newOptimize.lower()
 
-        if newOptimize not in ['true', 'false']:
+        if newOptimize not in ["true", "false"]:
             raise TypeError("Please enter True or False")
 
         else:
             print("Optimization set as", newOptimize.upper())
 
-            self._optimize = True if newOptimize == 'true' else False
+            self._optimize = True if newOptimize == "true" else False
 
     @property
     def RFR(self):
         """
         | Risk-Free rate. The default value is 2 percent.
-        | 
+        |
         | Example:
         --------
-        
+
         >>>print(Foo.RFR)
-        
-        2   
-        
+
+        2
+
         :return: Returns RFR in percent.
         """
         return self._RFR
@@ -374,7 +401,13 @@ class PyOpt:
 
         :param stocks: list of stocks to add. Please note to use [] even if single item. Non-case sensitive
         """
-        stocks = ' '.join([str(a).upper() for a in stocks])
+        stocks = " ".join(
+            [
+                str(a).upper()
+                for a in stocks
+                if a.upper() not in self._symbols_for_yfinance
+            ]
+        )
         # if stocks added, trading days are 252
 
         if stocks:
@@ -394,14 +427,19 @@ class PyOpt:
 
         :param crypto: list of crypto to add. Please note to use [] even if single item. Non-case sensitive
         """
-
-        crypto = ' '.join([str(a).upper() + '-USD' for a in crypto])
+        crypto = " ".join(
+            [
+                str(coin).upper() + "-USD"
+                for coin in crypto
+                if coin.upper() not in self._symbols_for_yfinance
+            ]
+        )
 
         self._symbols_for_yfinance = self._symbols_for_yfinance + " " + crypto
 
     # Main run function
 
-    def run(self):
+    def run(self, method: Optional[str] = None):
         """
         | Main run function
         |
@@ -412,8 +450,11 @@ class PyOpt:
         | Performs Monte Carlo method followed by scipy.minimize
         |
         | Plots efficient frontier graph and gives weights
+
+        :param method: Default is the method set in __init__, can be overriden here.
         """
 
+        method = method or self._method
         # Remove additional spaces at the end
         # Convert the given string to a list of tickers for dataframe rearrangement
         self._tickers = self._symbols_for_yfinance.strip().split(" ")
@@ -423,31 +464,38 @@ class PyOpt:
 
         # Check if symbols is empty or less than 2
         if self._number_of_tickers <= 1:
-            raise ValueError("Needs more than 1 asset to optimize. Use add_stocks or add_crypto")
+            raise ValueError(
+                "Needs more than 1 asset to optimize. Use add_stocks or add_crypto"
+            )
 
         # Download data from yfinance
         # Interval of 1 day is fixed
 
-        self._fullDf = yf.download(self._symbols_for_yfinance,
-                                   interval='1d',
-                                   period=self._period,
-                                   actions=False,
-                                   group_by='ticker')
+        self._fullDf = yf.download(
+            self._symbols_for_yfinance,
+            interval="1d",
+            period=self._period,
+            actions=False,
+            group_by="ticker",
+        )
 
         # Prep dataframe
         self._dataframe_prep()
 
         # Print params
-        self._get_params()
+        if not os.getenv("IS_STREAMLIT"):
+            self._get_params()
 
         """
         TODO: Test performance using current  weights. Useful if stock/crypto has no fractional shares
         and you're not able to get the exact weights provided by the script
         """
         if self._optimize:
-            self._monte_carlo()
-            self._summary()
-            self._fit()
+            if method == "fmin":
+                return self._fit()
+            else:
+                self._monte_carlo()
+                self._summary()
             plt.show()
 
         # TODO: Backtest function
@@ -461,13 +509,15 @@ class PyOpt:
         self._fullDf.dropna(inplace=True)
 
         # Reduce multiindex into one level
-        self._fullDf.columns = [' '.join(col) for col in self._fullDf.columns.values]
+        self._fullDf.columns = [" ".join(col) for col in self._fullDf.columns.values]
 
         # Keep only Adj Close
-        self._fullDf = self._fullDf.loc[:, self._fullDf.columns.str.contains('Adj Close', case=True)]
+        self._fullDf = self._fullDf.loc[
+            :, self._fullDf.columns.str.contains("Adj Close", case=True)
+        ]
 
         # Remove Adj Close just to get name of tickers
-        self._fullDf.columns = self._fullDf.columns.str.replace(' Adj Close', '')
+        self._fullDf.columns = self._fullDf.columns.str.replace(" Adj Close", "")
 
         # Arrange columns into given tickers for easier readability
 
@@ -477,15 +527,17 @@ class PyOpt:
         self._log_returns = self._fullDf.pct_change()
 
     def _get_params(self):
-        print(f"CURRENT PARAMS\n"
-              f"{'=' * 60}\n"
-              f"Number of tickers:\t {self._number_of_tickers}\n"
-              f"Tickers: \t{str(self._tickers)}\n"
-              f"Risk Free Rate: \t{self._RFR} %\t\t"
-              f"Period:\t {self._period}\n"
-              f"Yearly Trading days (For APY, not affected by period) :\t {self._trading_days} days\n"
-              f"Number of simulations:\t {self._simulations}\t\t"
-              f"Scipy target: \t{self._minimize.upper()}")
+        print(
+            f"CURRENT PARAMS\n"
+            f"{'=' * 60}\n"
+            f"Number of tickers:\t {self._number_of_tickers}\n"
+            f"Tickers: \t{str(self._tickers)}\n"
+            f"Risk Free Rate: \t{self._RFR} %\t\t"
+            f"Period:\t {self._period}\n"
+            f"Yearly Trading days (For APY, not affected by period) :\t {self._trading_days} days\n"
+            f"Number of simulations:\t {self._simulations}\t\t"
+            f"Scipy target: \t{self._minimize.upper()}"
+        )
 
     """Monte Carlo method functions"""
 
@@ -535,11 +587,16 @@ class PyOpt:
             all_weights[ind, :] = weights
 
             # Calculate the expected log returns, and add them to the `returns_array`.
-            ret_arr[ind] = np.sum(self._log_returns.mean() * weights * self._trading_days)
+            ret_arr[ind] = np.sum(
+                self._log_returns.mean() * weights * self._trading_days
+            )
 
             # Calculate the volatility, and add them to the `volatility_array`.
             vol_arr[ind] = np.sqrt(
-                np.dot(weights.T, np.dot(self._log_returns.cov() * self._trading_days, weights))
+                np.dot(
+                    weights.T,
+                    np.dot(self._log_returns.cov() * self._trading_days, weights),
+                )
             )
 
             # Calculate the Sharpe Ratio and Add it to the `sharpe_ratio_array`.
@@ -553,10 +610,10 @@ class PyOpt:
 
         # Give the columns the Proper Names.
         self._simulations_df.columns = [
-            'Returns',
-            'Volatility',
-            'Sharpe Ratio',
-            'Portfolio Weights'
+            "Returns",
+            "Volatility",
+            "Sharpe Ratio",
+            "Portfolio Weights",
         ]
 
         self._simulations_df = self._simulations_df.infer_objects()
@@ -567,35 +624,39 @@ class PyOpt:
 
         # Convert returns to %
 
-        self._simulations_df['Returns'] = self._simulations_df['Returns'] * 100
+        self._simulations_df["Returns"] = self._simulations_df["Returns"] * 100
 
         # Return the Max Sharpe Ratio from the run.
-        self._max_sharpe_ratio = self._simulations_df.loc[self._simulations_df['Sharpe Ratio'].idxmax()]
+        self._max_sharpe_ratio = self._simulations_df.loc[
+            self._simulations_df["Sharpe Ratio"].idxmax()
+        ]
 
         # Return the Min Volatility from the run.
-        self._min_volatility = self._simulations_df.loc[self._simulations_df['Volatility'].idxmin()]
+        self._min_volatility = self._simulations_df.loc[
+            self._simulations_df["Volatility"].idxmin()
+        ]
 
         # Plot the data on a Scatter plot.
         plt.scatter(
-            y=self._simulations_df['Returns'],
-            x=self._simulations_df['Volatility'],
-            c=self._simulations_df['Sharpe Ratio'],
-            cmap='RdYlBu'
+            y=self._simulations_df["Returns"],
+            x=self._simulations_df["Volatility"],
+            c=self._simulations_df["Sharpe Ratio"],
+            cmap="RdYlBu",
         )
 
         # Give the Plot some labels, and titles.
-        plt.title('Portfolio Returns Vs. Risk')
-        plt.colorbar(label='Sharpe Ratio')
-        plt.xlabel('Standard Deviation')
-        plt.ylabel('Returns')
+        plt.title("Portfolio Returns Vs. Risk")
+        plt.colorbar(label="Sharpe Ratio")
+        plt.xlabel("Standard Deviation")
+        plt.ylabel("Returns")
 
         # Plot the Max Sharpe Ratio, using a `Red Star`.
         plt.scatter(
             self._max_sharpe_ratio[1],
             self._max_sharpe_ratio[0],
             marker=(5, 1, 0),
-            color='r',
-            s=600
+            color="r",
+            s=600,
         )
 
         # Plot the Min Volatility, using a `Blue Star`.
@@ -603,8 +664,8 @@ class PyOpt:
             self._min_volatility[1],
             self._min_volatility[0],
             marker=(5, 1, 0),
-            color='b',
-            s=600
+            color="b",
+            s=600,
         )
 
         # Finally, show the plot.
@@ -619,21 +680,21 @@ class PyOpt:
 
         # Print out max and min volatality
 
-        print('')
-        print('=' * 60)
-        print('MAX SHARPE RATIO:')
-        print('-' * 60)
+        print("")
+        print("=" * 60)
+        print("MAX SHARPE RATIO:")
+        print("-" * 60)
         details = self._get_weights(self._max_sharpe_ratio)
         print(details)
-        print('-' * 60)
+        print("-" * 60)
 
-        print('')
-        print('=' * 60)
-        print('MIN VOLATILITY:')
-        print('-' * 60)
+        print("")
+        print("=" * 60)
+        print("MIN VOLATILITY:")
+        print("-" * 60)
         details = self._get_weights(self._min_volatility)
         print(details)
-        print('-' * 60)
+        print("-" * 60)
 
     # Get weights for monte carlo
 
@@ -647,11 +708,13 @@ class PyOpt:
         print("Weights:")
         weights = pd.DataFrame(resultSeries[3])
         result = pd.concat([pd.Series(self._tickers), weights], axis=1)
-        result.set_axis(['Tickers', 'Weights'], axis=1, inplace=True)
-        result.set_index('Tickers', inplace=True)
+        result.set_axis(["Tickers", "Weights"], axis=1, inplace=True)
+        result.set_index("Tickers", inplace=True)
 
         # Convert to xx%
-        result['Weights'] = result['Weights'].apply(lambda x: str(round(x * 100, 3)) + "%")
+        result["Weights"] = result["Weights"].apply(
+            lambda x: str(round(x * 100, 3)) + "%"
+        )
 
         # Result is a dataframe of tickers/weights
 
@@ -663,10 +726,12 @@ class PyOpt:
 
     def _fit(self):
 
-        bounds = tuple((0, self._max_weights / 100) for symbol in range(self._number_of_tickers))
+        bounds = tuple(
+            (0, self._max_weights / 100) for _ in range(self._number_of_tickers)
+        )
 
         # Define the constraints, here I'm saying that the sum of each weight must not exceed 100%.
-        constraints = ({'type': 'eq', 'fun': self._check_sum})
+        constraints = {"type": "eq", "fun": self._check_sum}
 
         init_guess = np.full(self._number_of_tickers, 1 / self._number_of_tickers)
 
@@ -674,9 +739,9 @@ class PyOpt:
         optimized_sharpe = sci_opt.minimize(
             fun=self._optimizing_func,
             x0=init_guess,  # minimize this. # Start with these values.
-            method='SLSQP',
+            method="SLSQP",
             bounds=bounds,  # don't exceed these bounds.
-            constraints=constraints  # make sure you don't exceed the 100% constraint.
+            constraints=constraints,  # make sure you don't exceed the 100% constraint.
         )
 
         weights = optimized_sharpe.x
@@ -684,24 +749,32 @@ class PyOpt:
         metrics = self._get_metrics(weights)
         weights_df = pd.DataFrame(weights)
         result = pd.concat([pd.Series(self._tickers), weights_df], axis=1)
-        result.set_axis(['Tickers', 'Weights'], axis=1, inplace=True)
-        result.set_index('Tickers', inplace=True)
+        result = result.set_axis(["Tickers", "Weights"], axis=1)
+        result.set_index("Tickers", inplace=True)
 
         # Convert to xx%
-        result['Weights'] = result['Weights'].apply(lambda x: str(round(x * 100, 3)) + "%")
+        result["Weights"] = result["Weights"].apply(
+            lambda x: str(round(x * 100, 3)) + "%"
+        )
 
+        if os.getenv("IS_STREAMLIT"):
+            return {
+                "target": self._minimize.upper(),
+                "metrics": metrics,
+                "result": result,
+            }
         # Print the results.
-        print('')
-        print('=' * 60)
-        print('OPTIMIZED SHARPE RATIO USING SCIPY\n')
-        print(f'TARGET:\t{self._minimize.upper()}')
-        print('-' * 60)
+        print("")
+        print("=" * 60)
+        print("OPTIMIZED SHARPE RATIO USING SCIPY\n")
+        print(f"TARGET:\t{self._minimize.upper()}")
+        print("-" * 60)
         print(f"Returns:\t {metrics[0] * 100:.3f}%")
         print(f"Volatility:\t {metrics[1]:.3f}")
         print(f"Sharpe Ratio:\t {metrics[2]:.3f}")
         print("Weights:")
         print(result)
-        print('-' * 60)
+        print("-" * 60)
 
     # Get returns, vol, sharpe from weights for Scipy
 
@@ -730,7 +803,9 @@ class PyOpt:
 
         # Calculate the volatility, remember to annualize them (252).
         vol = np.sqrt(
-            np.dot(weights.T, np.dot(self._log_returns.cov() * self._trading_days, weights))
+            np.dot(
+                weights.T, np.dot(self._log_returns.cov() * self._trading_days, weights)
+            )
         )
 
         # Calculate the Sharpe Ratio.
@@ -756,11 +831,11 @@ class PyOpt:
         (np.array): An numpy array of the portfolio metrics.
         """
         # Return negative sharpe
-        if self._minimize.lower() == 'sharpe':
+        if self._minimize.lower() == "sharpe":
             return -self._get_metrics(weights)[2]
 
         # Return vol
-        elif self._minimize.lower() == 'vol':
+        elif self._minimize.lower() == "vol":
             return self._get_metrics(weights)[1]
 
         # Return negative returns
