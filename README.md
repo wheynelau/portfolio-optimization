@@ -1,4 +1,4 @@
-# Portfolio Optimization in Python with cryptocurrencies
+# Portfolio Optimization in Python
 
 ## Table of Contents
 
